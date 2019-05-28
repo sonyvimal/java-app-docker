@@ -12,6 +12,10 @@ node {
     Thanks - GTA''', cc: '', from: '', replyTo: '', subject: 'From Jenkins Server | Local System', to: 'vimal.soni@gta-travel.com'
   }
   stage('Slack Notification'){
-    slackSend baseUrl: 'https://hooks.slack.com/services/', channel: '#gta', color: 'good', message: 'Jenkins Notification', teamDomain: 'devops-lcc7986.slack.com', tokenCredentialId: 'slack-demo'
+    slackSend baseUrl: 'https://hooks.slack.com/services/',
+    channel: '#gta', color: 'good',
+    message: 'Jenkins Notification',
+    teamDomain: 'devops-lcc7986.slack.com',
+    tokenCredentialId: 'slack-demo'
   }
 }
