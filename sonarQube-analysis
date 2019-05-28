@@ -12,6 +12,13 @@ node {
       withSonarQubeEnv('Sonar-7.7')
       sh "${mvnHome}/bin/mvn package"
   }
+
+  stage('SonarQube analysis') {
+    withSonarQubeEnv('Sonar-7.7') {
+      // requires SonarQube Scanner for Maven 3.2+
+      sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.2:sonar'
+    }
+  }
   stage('Email Notification'){
     mail bcc: '', body: '''This is local Jenkins | Build Reports
     Thanks - GTA''', cc: '', from: '', replyTo: '', subject: 'From Jenkins Server | Local System', to: 'vimal.soni@gta-travel.com'
