@@ -7,4 +7,8 @@ node {
   stage('Package Compilation'){
     sh 'mvn package'
   }
+  stage('Email Notification'){
+    mail bcc: '', body: '''This is local Jenkins | Build Reports
+    Thanks - GTA''', cc: '', from: '', replyTo: '', subject: 'From Jenkins Server | Local System', to: 'vimal.soni@gta-travel.com'
+  }
 }
