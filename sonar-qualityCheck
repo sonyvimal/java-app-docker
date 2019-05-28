@@ -1,0 +1,41 @@
+echo "Sonar Code Quality Check"
+
+node {
+  stage('GITHub Repository Codebase Checkout'){
+    git 'https://github.com/sonyvimal/java-app'
+  }
+  stage('Package Compilation'){
+    sh 'mvn package'
+  }
+  stage('SonarQube analysis') {
+    withSonarQubeEnv('Sonar-7.7') {
+      // requires SonarQube Scanner for Maven 3.2+
+      sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.2:sonar'
+    }
+  }
+  stage("Sonar Code Quality Gate"){
+          timeout(time: 1, unit: 'HOURS') {
+              def qg = waitForQualityGate()
+              if (qg.status != 'OK') {
+              slackSend baseUrl: 'https://hooks.slack.com/services/',
+              channel: '#gta',
+              color: 'danger',
+              message: 'Sonar Code Quality Analysis Failed',
+              teamDomain: 'devops-lcc7986.slack.com',
+              tokenCredentialId: 'slack-demo'
+              error "Pipeline aborted due to quality gate failure: ${qg.status}"
+      }
+    }
+  }
+  stage('Email Notification'){
+    mail bcc: '', body: '''This is local Jenkins | Build Reports
+    Thanks - GTA''', cc: '', from: '', replyTo: '', subject: 'From Jenkins Server | Local System', to: 'vimal.soni@gta-travel.com'
+  }
+  stage('Slack Notification'){
+    slackSend baseUrl: 'https://hooks.slack.com/services/',
+    channel: '#gta', color: 'good',
+    message: 'Jenkins Notification',
+    teamDomain: 'devops-lcc7986.slack.com',
+    tokenCredentialId: 'slack-demo'
+  }
+}
