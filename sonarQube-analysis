@@ -8,9 +8,8 @@ node {
     sh 'mvn package'
   }
   stage('SonarQube Analysis'){
-      def mvnHome = tool name: 'M3', type: 'maven'
-      withSonarQubeEnv('Sonar-7.7')
-      sh "${mvnHome}/bin/mvn package"
+    withSonarQubeEnv('Sonar-7.7')
+    sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.2:sonar'
   }
   stage('Email Notification'){
     mail bcc: '', body: '''This is local Jenkins | Build Reports
