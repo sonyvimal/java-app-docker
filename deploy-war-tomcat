@@ -28,8 +28,8 @@ node{
        }
      }
    }
-   stage('Deploy to Tomcat Server'){
-        copyArtifacts(target/*.war /Users/sonr/tools/installer/tomcat-2/apache-tomcat-9.0.16/webapps/)
+  stage('Deploy to Tomcat Server'){
+
    }
    stage('Email Notification'){
       mail bcc: '', body: '''Hi Welcome to jenkins email alerts
