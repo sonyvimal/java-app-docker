@@ -29,7 +29,7 @@ node{
      }
    }
    stage('Deploy to Tomcat Server'){
-        cp -o StrictHostKeyChecking=no target/*.war /Users/sonr/tools/installer/tomcat-2/apache-tomcat-9.0.16/webapps
+        cp target/*.war /Users/sonr/tools/installer/tomcat-2/apache-tomcat-9.0.16/webapps
    }
    stage('Email Notification'){
       mail bcc: '', body: '''Hi Welcome to jenkins email alerts
