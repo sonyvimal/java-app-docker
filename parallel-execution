@@ -1,0 +1,64 @@
+node{
+parallel firstBranch: {
+    stage ('Master Branch Checkout')
+    {
+      dir('master-checkout') {
+       git url: 'https://github.com/sonyvimal/java-app.git',
+       branch: 'master'
+
+       stage('Package Compilation'){
+       sh 'mvn package'
+       }
+       stage('Package Build - Email Notification'){
+         mail bcc: '', body: '''This is local Jenkins | Build Reports
+         Thanks - GTA''', cc: '', from: '', replyTo: '', subject: 'From Jenkins Server | Local System', to: 'vimal.soni@gta-travel.com'
+       }
+       stage('Package Build - Slack Notification'){
+         slackSend baseUrl: 'https://hooks.slack.com/services/',
+         channel: '#gta', color: 'good',
+         message: 'Jenkins Notification',
+         teamDomain: 'devops-lcc7986.slack.com',
+         tokenCredentialId: 'slack-demo'
+       }
+      }
+    }
+}, secondBranch: {
+    stage ('Feature Branch Checkout'){
+      dir('feature-checkout') {
+        git url: 'https://github.com/sonyvimal/java-app.git',
+        branch: 'feature-1'
+        }
+     }
+     stage('SonarQube analysis') {
+       withSonarQubeEnv('Sonar-7.7') {
+       // requires SonarQube Scanner for Maven 3.2+
+       sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.2:sonar'
+       }
+     }
+     stage("Sonar Code Quality Gate"){
+          timeout(time: 1, unit: 'HOURS'){
+              def qg = waitForQualityGate()
+              if (qg.status != 'OK') {
+              slackSend baseUrl: 'https://hooks.slack.com/services/',
+              channel: '#gta',
+              color: 'danger',
+              message: 'Sonar Code Quality Analysis Failed',
+              teamDomain: 'devops-lcc7986.slack.com',
+              tokenCredentialId: 'slack-demo'
+              error "Pipeline aborted due to quality gate failure: ${qg.status}"
+              }
+          }
+      }
+      stage('Code Quality - Email Notification'){
+        mail bcc: '', body: '''This is local Jenkins | Build Reports
+        Thanks - GTA''', cc: '', from: '', replyTo: '', subject: 'From Jenkins Server | Local System', to: 'vimal.soni@gta-travel.com'
+      }
+      stage('Code Quality - Slack Notification'){
+        slackSend baseUrl: 'https://hooks.slack.com/services/',
+        channel: '#gta', color: 'good',
+        message: 'Jenkins Notification',
+        teamDomain: 'devops-lcc7986.slack.com',
+        tokenCredentialId: 'slack-demo'
+      }
+    }
+}
